@@ -4,22 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use phpDocumentor\Reflection\Utils;
 
-class shoppingCart extends Model
+class orders extends Model
 {
     use HasFactory;
+
     protected $guarded = [];
-    public function product()
+
+    public function products()
     {
         return $this->belongsTo(products::class);
     }
 
-    const STATUS = [
-        'pending'       => 0,
-        'in_process'    => 1,
-        'success'       => 2,
-        'error'         => 3
-    ];
-
-
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

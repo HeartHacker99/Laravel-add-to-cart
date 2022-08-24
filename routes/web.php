@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use \App\Http\Livewire\Shoppingcart;
+use \App\Http\Controllers\PaypalController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -22,6 +23,10 @@ Route::get('/dashboard', function () {
 })->middleware(['auth'])->name('dashboard');
 
 
-Route::get('shoppingcart', Shoppingcart::class)->name('shoppingcart');
+Route::get('shoppingcart', Shoppingcart::class)->name('shoppingcart')->middleware(['auth']);
+
+Route::get('payment-cancel', [PaypalController::class, 'cancel'])->name('payment.cancel');
+
+Route::get('payment-success', [PaypalController::class, 'success'])->name('payment.success');
 
 require __DIR__.'/auth.php';

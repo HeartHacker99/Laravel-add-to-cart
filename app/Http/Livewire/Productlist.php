@@ -6,6 +6,7 @@ use App\Models\products;
 use App\Models\shoppingCart;
 use Livewire\Component;
 
+
 class Productlist extends Component
 {
     public $products;
@@ -24,9 +25,18 @@ class Productlist extends Component
                 'product_id' => $id,
                 'user_id' => auth()->user()->id
             ];
+
             shoppingCart::updateOrCreate($data);
 
-            $this->emit('updateCartCount');
+//            Elequant Standart Method
+
+//           $shopping = new shoppingCart();
+//            $shopping->product_id = $id;
+//            $shopping->user_id = auth()->user()->id;
+//            $shopping->save();
+
+
+                $this->emit('updateCartCount');
 
             session()->flash('success', 'Product added to the cart successfully.');
         }
@@ -35,4 +45,6 @@ class Productlist extends Component
             return $this->redirect(route('login'));
         }
     }
+
+
 }

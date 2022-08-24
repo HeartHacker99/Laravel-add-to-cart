@@ -3,13 +3,18 @@
 namespace App\Http\Livewire;
 use \App\Models\shoppingCart as Cart;
 use Livewire\Component;
+use Srmklive\PayPal\Services\PayPal as PayPalClient;
+
 
 class Shoppingcart extends Component
 {
     public $cartitems, $sub_total, $total, $tax;
     public function render()
     {
-        $this->cartitems = Cart::with('product')->where(['user_id'=>auth()->user()->id])->get();
+        $this->cartitems = Cart::with('product')
+            ->where(['user_id'=>auth()->user()->id])
+            ->where('status', '!=', Cart::STATUS['success'])
+            ->get();
         $this->sub_total = 0;
         $this->total = 0;
         $this->tax = 0;
@@ -57,4 +62,38 @@ class Shoppingcart extends Component
         session()->flash('sussess', 'Item Removed Successfully !!!');
     }
 
+
+
+    public function checkout(){
+        $provider = new PayPalClient([]);
+        $token = $provider->getAccessToken();
+        $provider->setAccessToken($token);
+
+        $order = $provider->createOrder([
+            "intent" => "CAPTURE",
+            "purchase_units" => [
+                [
+                    "amount" => [
+                        "currency_code" => 'USD',
+                        'value'  => $this->total
+                    ]
+                ]
+            ],
+            'application_context' => [
+                'cancel_url' => route('payment.cancel'),
+                'return_url' => route('payment.success')
+            ]
+
+        ]);
+
+        if($order['status'] == 'CREATED'){
+            foreach($this->cartitems as $item){
+                $item->status = Cart::STATUS['in_process'];
+                $item->payment_id = $order['id'];
+                $item->save();
+            }
+            return redirect($order['links'][1]['href']);
+        }
+        session()->flash('error','Something went wrong, Please Try again');
+    }
 }

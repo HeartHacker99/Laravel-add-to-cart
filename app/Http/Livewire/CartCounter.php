@@ -19,6 +19,8 @@ class CartCounter extends Component
 
     public function getCartItemsCount()
     {
-        $this->total = shoppingCart::whereUserId(auth()->user()->id)->count();
+        $this->total = shoppingCart::whereUserId(auth()->user()->id)
+            ->where('status', '!=', shoppingCart::STATUS['success'])
+            ->count();
     }
 }
